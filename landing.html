@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaRAG | AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* Light Mode (Default) */
+        body.light-mode {
+            background: #ffffff;
+            color: #1e293b;
+        }
+
+        body.light-mode .sidebar {
+            background: #f9f9f9;
+            border-right: 1px solid #e5e5e5;
+        }
+
+        body.light-mode .history-item:hover {
+            background: #e9e9e9;
+        }
+
+        body.light-mode .history-item.active {
+            background: #e0f2fe;
+            color: #0d4c5c;
+        }
+
+        body.light-mode .top-nav {
+            background: white;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        body.light-mode .message-wrapper.ai-message {
+            background: #fafafa;
+        }
+
+        body.light-mode .chat-input {
+            background: #fafafa;
+            border: 1px solid #e5e5e5;
+        }
+
+        /* Dark Mode */
+        body.dark-mode {
+            background: #1a1a1a;
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .sidebar {
+            background: #2d2d2d;
+            border-right: 1px solid #404040;
+        }
+
+        body.dark-mode .history-item {
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .history-item:hover {
+            background: #404040;
+        }
+
+        body.dark-mode .history-item.active {
+            background: #0d4c5c;
+            color: white;
+        }
+
+        body.dark-mode .top-nav {
+            background: #2d2d2d;
+            border-bottom: 1px solid #404040;
+        }
+
+        body.dark-mode .message-wrapper.ai-message {
+            background: #2d2d2d;
+        }
+
+        body.dark-mode .message-text {
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .chat-input {
+            background: #2d2d2d;
+            border: 1px solid #404040;
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .chat-input::placeholder {
+            color: #888;
+        }
+
+        body.dark-mode .quick-action-chip {
+            background: #404040;
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .quick-action-chip:hover {
+            background: #4d4d4d;
+        }
+
+        body.dark-mode .new-chat-btn {
+            background: #404040;
+            color: #e5e5e5;
+            border-color: #4d4d4d;
+        }
+
+        body.dark-mode .logout-btn {
+            background: #404040;
+            color: #e5e5e5;
+            border-color: #4d4d4d;
+        }
+
+        body.dark-mode .modal-content {
+            background: #2d2d2d;
+            color: #e5e5e5;
+        }
+
+        body.dark-mode .feature-list li {
+            color: #e5e5e5;
+        }
+
+        /* Main layout */
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        /* Sidebar - Chat History */
+        .sidebar {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+        }
+
+        .sidebar-header {
+            padding: 20px 15px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        body.dark-mode .sidebar-header {
+            border-bottom-color: #404040;
+        }
+
+        .new-chat-btn {
+            width: 100%;
+            padding: 12px;
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        body.dark-mode .new-chat-btn {
+            background: #404040;
+            color: #e5e5e5;
+            border-color: #4d4d4d;
+        }
+
+        .new-chat-btn:hover {
+            background: #f0f0f0;
+        }
+
+        body.dark-mode .new-chat-btn:hover {
+            background: #4d4d4d;
+        }
+
+        .chat-history {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+
+        .history-item {
+            padding: 12px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .history-icon {
+            font-size: 16px;
+        }
+
+        .history-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .delete-chat {
+            opacity: 0;
+            color: #ef4444;
+            font-size: 18px;
+            padding: 0 5px;
+            transition: opacity 0.2s;
+        }
+
+        .history-item:hover .delete-chat {
+            opacity: 1;
+        }
+
+        .delete-chat:hover {
+            color: #dc2626;
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        body.dark-mode .sidebar-footer {
+            border-top-color: #404040;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #0d4c5c 0%, #2c7a8c 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-email {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .settings-icon {
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+
+        .settings-icon:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .settings-icon:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 30px;
+            transition: background 0.3s;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            display: none;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .logo-small {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .logo-small span {
+            font-size: 20px;
+        }
+
+        .logo-small h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0d4c5c;
+        }
+
+        body.dark-mode .logo-small h2 {
+            color: #2c7a8c;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .premium-badge {
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .query-badge {
+            padding: 6px 12px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 40px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        body.dark-mode .query-badge {
+            background: #166534;
+            color: #dcfce7;
+        }
+
+        .theme-toggle {
+            padding: 6px 12px;
+            border: 1px solid #e5e5e5;
+            border-radius: 40px;
+            font-size: 13px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        body.dark-mode .theme-toggle {
+            border-color: #404040;
+            color: #e5e5e5;
+        }
+
+        .logout-btn {
+            padding: 6px 16px;
+            border: 1px solid #e5e5e5;
+            background: white;
+            border-radius: 40px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        body.dark-mode .logout-btn {
+            background: #404040;
+            color: #e5e5e5;
+            border-color: #4d4d4d;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 0;
+        }
+
+        .chat-messages {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .message-wrapper {
+            display: flex;
+            padding: 20px 30px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        body.dark-mode .message-wrapper {
+            border-bottom-color: #333;
+        }
+
+        .message-wrapper.ai-message {
+            background: #fafafa;
+        }
+
+        .message-content {
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            gap: 16px;
+        }
+
+        .message-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .user-avatar-message {
+            background: #9ca3af;
+            color: white;
+        }
+
+        .ai-avatar-message {
+            background: linear-gradient(135deg, #0d4c5c 0%, #2c7a8c 100%);
+            color: white;
+        }
+
+        .message-text {
+            flex: 1;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .message-text p {
+            margin-bottom: 12px;
+        }
+
+        .message-text ul, .message-text ol {
+            margin-left: 20px;
+            margin-bottom: 12px;
+        }
+
+        .source-citation {
+            margin-top: 12px;
+            padding: 12px 16px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            font-size: 13px;
+            border-left: 3px solid #2c7a8c;
+        }
+
+        body.dark-mode .source-citation {
+            background: #404040;
+            color: #e5e5e5;
+        }
+
+        .source-citation span {
+            font-weight: 600;
+            color: #0d4c5c;
+        }
+
+        body.dark-mode .source-citation span {
+            color: #2c7a8c;
+        }
+
+        /* Input Area */
+        .input-container {
+            border-top: 1px solid #e5e5e5;
+            padding: 20px 30px;
+            transition: border-color 0.3s;
+        }
+
+        body.dark-mode .input-container {
+            border-top-color: #404040;
+        }
+
+        .input-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 16px 50px 16px 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+            resize: none;
+            font-family: inherit;
+            min-height: 60px;
+            max-height: 200px;
+        }
+
+        .chat-input:focus {
+            border-color: #2c7a8c;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .send-button {
+            position: absolute;
+            right: 12px;
+            bottom: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #2c7a8c;
+            font-size: 20px;
+            padding: 5px;
+        }
+
+        .send-button:hover:not(:disabled) {
+            color: #0d4c5c;
+        }
+
+        .send-button:disabled {
+            color: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .input-footer {
+            max-width: 800px;
+            margin: 10px auto 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #94a3b8;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-chip {
+            padding: 4px 12px;
+            background: #f1f5f9;
+            border-radius: 30px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .quick-action-chip:hover {
+            background: #e2e8f0;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #94a3b8;
+        }
+
+        .close-modal:hover {
+            color: #475569;
+        }
+
+        .modal-header {
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            color: #0d4c5c;
+            margin-bottom: 10px;
+        }
+
+        .settings-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        body.dark-mode .settings-section {
+            border-bottom-color: #404040;
+        }
+
+        .settings-section h3 {
+            margin-bottom: 15px;
+            color: #2c7a8c;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #f8fafc;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select {
+            background: #404040;
+            border-color: #4d4d4d;
+            color: #e5e5e5;
+        }
+
+        .form-group input:focus {
+            border-color: #2c7a8c;
+            outline: none;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0d4c5c 0%, #2c7a8c 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(44, 122, 140, 0.3);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-secondary {
+            background: #e5e5e5;
+            color: #1e293b;
+        }
+
+        body.dark-mode .btn-secondary {
+            background: #404040;
+            color: #e5e5e5;
+        }
+
+        .settings-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+        }
+
+        /* Toggle Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2c7a8c;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Price Box */
+        .price-box {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 16px;
+        }
+
+        body.dark-mode .price-box {
+            background: #404040;
+        }
+
+        .price-box .price {
+            font-size: 40px;
+            font-weight: 800;
+            color: #0d4c5c;
+        }
+
+        body.dark-mode .price-box .price {
+            color: #2c7a8c;
+        }
+
+        /* Feature List */
+        .feature-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            color: #2c7a8c;
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+                background: white;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            }
+
+            body.dark-mode .sidebar {
+                background: #2d2d2d;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <div class="app-container">
+        <!-- Sidebar - Chat History -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="new-chat-btn" onclick="startNewChat()">
+                    <span>+</span> New Chat
+                </button>
+            </div>
+            
+            <div class="chat-history" id="chatHistory">
+                <!-- Chat history items will be added dynamically -->
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="sidebarUserAvatar">US</div>
+                    <div class="user-details">
+                        <div class="user-name" id="sidebarUserName">User</div>
+                        <div class="user-email" id="sidebarUserEmail">user@example.com</div>
+                    </div>
+                    <span class="settings-icon" onclick="openSettingsModal()">⚙️</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Top Navigation -->
+            <div class="top-nav">
+                <div class="nav-left">
+                    <div class="menu-toggle" onclick="toggleSidebar()">☰</div>
+                    <div class="logo-small" onclick="window.location.href='landing.html'">
+                        <span>💊</span>
+                        <h2>PharmaRAG</h2>
+                    </div>
+                </div>
+
+                <div class="nav-right">
+                    <span class="query-badge" id="queryDisplay">Free: 10/10</span>
+                    <span class="premium-badge" onclick="openPremiumModal()">⭐ Upgrade</span>
+                    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙 Dark</button>
+                    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-container" id="chatContainer">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Welcome message will be added dynamically -->
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        class="chat-input" 
+                        id="queryInput" 
+                        placeholder="Ask about drugs, interactions, clinical trials..."
+                        rows="1"
+                        onkeydown="handleKeyDown(event)"
+                    ></textarea>
+                    <button class="send-button" onclick="sendQuery()" id="sendButton">➤</button>
+                </div>
+                <div class="input-footer">
+                    <div class="quick-actions">
+                        <span class="quick-action-chip" onclick="quickAsk('What are the interactions with ibuprofen?')">💊 Ibuprofen</span>
+                        <span class="quick-action-chip" onclick="quickAsk('Latest Alzheimer\'s clinical trials')">🧠 Alzheimer's</span>
+                        <span class="quick-action-chip" onclick="quickAsk('SSRI side effects')">📋 SSRIs</span>
+                        <span class="quick-action-chip" onclick="quickAsk('Amoxicillin dosage')">⚕️ Amoxicillin</span>
+                        <span class="quick-action-chip" onclick="quickAsk('Cancer trials 2024')">🔬 Cancer</span>
+                    </div>
+                    <span id="queryCount">10 free queries remaining</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeSettingsModal()">&times;</span>
+            
+            <div class="modal-header">
+                <h2>⚙️ Settings</h2>
+                <p>Manage your account preferences</p>
+            </div>
+
+            <div class="settings-section">
+                <h3>Profile Information</h3>
+                <div class="form-group">
+                    <label>Display Name</label>
+                    <input type="text" id="settingsName" placeholder="Your name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="settingsEmail" placeholder="your@email.com">
+                </div>
+                <button class="btn btn-primary" onclick="updateProfile()">Update Profile</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Preferences</h3>
+                <div class="settings-row">
+                    <span>Dark Mode</span>
+                    <label class="switch">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleThemeFromSettings()">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <span>Email Notifications</span>
+                    <label class="switch">
+                        <input type="checkbox" id="emailNotifications" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>Language</label>
+                    <select id="languageSelect">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3>Data Management</h3>
+                <button class="btn btn-secondary" style="margin-right: 10px;" onclick="exportData()">Export Data</button>
+                <button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Chat History</h3>
+                <button class="btn btn-secondary" style="margin-right: 10px;" onclick="clearAllChats()">Clear All Chats</button>
+                <button class="btn btn-secondary" onclick="exportChats()">Export Chats</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Modal -->
+    <div class="modal" id="premiumModal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closePremiumModal()">&times;</span>
+            
+            <div class="modal-header">
+                <h2>🚀 Upgrade to Premium</h2>
+                <p>Unlock unlimited access</p>
+            </div>
+
+            <div class="price-box">
+                <div class="price">$49<span style="font-size: 14px;">/month</span></div>
+            </div>
+
+            <ul class="feature-list">
+                <li>Unlimited AI queries</li>
+                <li>Real-time clinical trial data</li>
+                <li>Advanced drug interaction checker</li>
+                <li>PDF export & reports</li>
+                <li>Priority support</li>
+            </ul>
+
+            <button class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="processPayment()">Upgrade Now</button>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let queriesRemaining = 10;
+        let isPremium = false;
+        let currentUser = {
+            name: localStorage.getItem('userName') || 'Dr. Smith',
+            email: localStorage.getItem('userEmail') || 'doctor@hospital.com',
+            fullName: localStorage.getItem('userFullName') || 'Dr. John Smith'
+        };
+        let chatHistory = [];
+        let currentChatId = null;
+
+        // Check login
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'landing.html';
+        }
+
+        // Hardcoded responses database - COMPREHENSIVE
+        const responseDatabase = {
+            'drug interactions': [
+                {
+                    keywords: ['ibuprofen', 'advil', 'motrin', 'nsaid'],
+                    response: 'Ibuprofen (NSAID) interactions:\n\n• Warfarin - Increased bleeding risk\n• Aspirin - Reduced cardioprotective effects\n• ACE Inhibitors - Reduced blood pressure control\n• Diuretics - Reduced effectiveness\n• Lithium - Increased lithium levels\n• Methotrexate - Increased toxicity\n• SSRIs - Increased bleeding risk\n• Corticosteroids - Increased GI bleeding risk\n• Alcohol - Increased stomach irritation\n• Anticoagulants - Enhanced anticoagulant effect',
+                    sources: 'FDA Drug Interactions Database, Mayo Clinic, Medscape'
+                },
+                {
+                    keywords: ['amoxicillin', 'amoxil', 'antibiotic'],
+                    response: 'Amoxicillin interactions:\n\n• Oral contraceptives - Reduced effectiveness\n• Warfarin - Increased INR\n• Allopurinol - Increased rash risk\n• Methotrexate - Increased toxicity\n• Probenecid - Increased amoxicillin levels\n• Tetracyclines - Reduced effectiveness\n• Antacids - Reduced absorption\n• Probiotics - May be killed by antibiotic\n• Live vaccines - Reduced effectiveness\n• Alcohol - No direct interaction, but may worsen side effects',
+                    sources: 'CDC Antibiotic Guidelines, Johns Hopkins ABX Guide'
+                },
+                {
+                    keywords: ['metformin', 'glucophage', 'diabetes'],
+                    response: 'Metformin interactions:\n\n• Alcohol - Increased lactic acidosis risk\n• Iodinated contrast - Acute kidney injury risk\n• Cimetidine - Increased metformin levels\n• Furosemide - Increased metformin levels\n• Nifedipine - Increased metformin absorption\n• Cationic drugs - Competition for renal transport\n• Topiramate - Increased lactic acidosis risk\n• Dolutegravir - Increased metformin levels\n• Vandetanib - Increased metformin levels\n• Carbamazepine - Reduced metformin effectiveness',
+                    sources: 'ADA Guidelines, Diabetes Care Journal'
+                }
+            ],
+            'clinical trials': [
+                {
+                    keywords: ['alzheimer', 'alzheimers', 'dementia', 'lecanemab', 'donanemab'],
+                    response: 'Latest Alzheimer\'s Clinical Trials (2024):\n\n1. Lecanemab (Phase 4) - 27% slowing in early AD\n2. Donanemab (Phase 3) - 35% slowing, FDA review pending\n3. Blarcamesine (Phase 2b/3) - Oral treatment showing promise\n4. Remternetug (Phase 3) - Next-gen anti-amyloid\n5. Buntanetap (Phase 2) - Neuroprotective effects\n6. Semaglutide (Phase 3) - Repurposed for AD\n7. ALZ-801 (Phase 3) - Oral anti-amyloid\n8. NE3107 (Phase 3) - Anti-inflammatory\n9. CT1812 (Phase 2) - Synaptic protection\n10. ATH-1017 (Phase 3) - Neurotrophic effects',
+                    sources: 'ClinicalTrials.gov, Alzheimer\'s Association, NEJM'
+                },
+                {
+                    keywords: ['cancer', 'oncology', 'tumor', 'mrna', 'immunotherapy'],
+                    response: 'Breakthrough Cancer Trials 2024:\n\n1. mRNA-4359 (Phase 1/2) - Lung cancer vaccine\n2. Iovance TIL (Phase 3) - Melanoma therapy\n3. CAR-T therapies (Phase 2) - Multiple myeloma\n4. Enhertu (Phase 3) - Breast cancer\n5. Opdualag (Phase 3) - Melanoma\n6. Keytruda combinations (Phase 3) - Various cancers\n7. T-DXd (Phase 3) - HER2+ cancers\n8. AMG 193 (Phase 1/2) - Solid tumors\n9. BMS-986299 (Phase 1) - Ovarian cancer\n10. Rezolute (Phase 2) - Pancreatic cancer',
+                    sources: 'NCI Cancer Trials, ASCO Publications'
+                }
+            ],
+            'side effects': [
+                {
+                    keywords: ['ssri', 'antidepressant', 'prozac', 'zoloft', 'celexa', 'depression'],
+                    response: 'Common SSRI Side Effects:\n\n1. Nausea (first 1-2 weeks)\n2. Headaches\n3. Insomnia or drowsiness\n4. Sexual dysfunction (30-50% of patients)\n5. Weight gain (long-term)\n6. Dry mouth\n7. Dizziness\n8. Increased anxiety (initial)\n9. Sweating\n10. GI disturbances',
+                    sources: 'JAMA Psychiatry, APA Guidelines'
+                },
+                {
+                    keywords: ['statin', 'lipitor', 'crestor', 'cholesterol'],
+                    response: 'Statin Side Effects Profile:\n\n1. Muscle pain (5-10%)\n2. Liver enzyme elevation\n3. Increased blood sugar\n4. Memory issues (rare)\n5. Confusion\n6. Headaches\n7. Nausea\n8. Rash\n9. Joint pain\n10. Peripheral neuropathy (rare)',
+                    sources: 'AHA/ACC Guidelines, NEJM'
+                }
+            ],
+            'dosage guidelines': [
+                {
+                    keywords: ['ibuprofen dosage', 'how much ibuprofen', 'ibuprofen dose', 'take ibuprofen'],
+                    response: 'Ibuprofen Dosing Guidelines:\n\nAdults:\n• Mild pain: 200-400mg q4-6h\n• Moderate pain: 400-600mg q6h\n• Max daily: 1200mg OTC, 3200mg prescription\n\nChildren:\n• 5-10mg/kg q6-8h\n• Max: 40mg/kg/day\n\nSpecial populations:\n• Elderly: Start at lowest dose\n• Renal impairment: Avoid or reduce dose\n• Hepatic impairment: Caution advised',
+                    sources: 'FDA Label, Pediatric Dosage Handbook'
+                },
+                {
+                    keywords: ['amoxicillin dosage', 'how much amoxicillin', 'amoxicillin dose', 'take amoxicillin'],
+                    response: 'Amoxicillin Dosing:\n\nAdults:\n• Mild infections: 250-500mg q8h\n• Severe infections: 875mg q12h\n• Strep throat: 50mg/kg/day (max 1000mg/day)\n\nChildren:\n• 20-90mg/kg/day divided q8-12h\n• Otitis media: 80-90mg/kg/day\n\nDuration:\n• Standard: 7-10 days\n• Strep throat: 10 days minimum',
+                    sources: 'Sanford Guide, Pediatric Infectious Diseases'
+                }
+            ],
+            'alzheimer treatment': [
+                {
+                    keywords: ['alzheimer treatment', 'alzheimer medication', 'alzheimer drug', 'donepezil', 'aricept', 'memantine', 'treat alzheimer'],
+                    response: 'Current Alzheimer\'s Treatments:\n\n1. Cholinesterase Inhibitors:\n   • Donepezil (Aricept) - All stages\n   • Rivastigmine (Exelon) - Mild to moderate\n   • Galantamine (Razadyne) - Mild to moderate\n\n2. NMDA Antagonist:\n   • Memantine (Namenda) - Moderate to severe\n\n3. Anti-amyloid antibodies:\n   • Lecanemab (Leqembi) - Early AD\n   • Donanemab (pending approval)\n\n4. Symptomatic treatments:\n   • Antidepressants\n   • Antipsychotics (caution)\n   • Mood stabilizers',
+                    sources: 'Alzheimer\'s Association, Neurology Journal'
+                }
+            ]
+        };
+
+        // Initialize
+        function init() {
+            const initial = currentUser.name.charAt(0).toUpperCase();
+            document.getElementById('sidebarUserAvatar').textContent = initial;
+            document.getElementById('sidebarUserName').textContent = currentUser.name;
+            document.getElementById('sidebarUserEmail').textContent = currentUser.email;
+            
+            // Load settings
+            document.getElementById('settingsName').value = currentUser.fullName || currentUser.name;
+            document.getElementById('settingsEmail').value = currentUser.email;
+            
+            // Load chat history from localStorage
+            loadChatHistory();
+            
+            // Show welcome message
+            showWelcomeMessage();
+            
+            updateQueryDisplay();
+            loadTheme();
+        }
+
+        // Show welcome message
+        function showWelcomeMessage() {
+            const messagesDiv = document.getElementById('chatMessages');
+            messagesDiv.innerHTML = `
+                <div class="message-wrapper ai-message">
+                    <div class="message-content">
+                        <div class="message-avatar ai-avatar-message">AI</div>
+                        <div class="message-text">
+                            <p>Hello Dr. ${currentUser.name}! 👋 I'm your pharmaceutical AI assistant.</p>
+                            <p>I can help you with:</p>
+                            <ul>
+                                <li><strong>Drug Interactions</strong> - Ask about ibuprofen, amoxicillin, metformin</li>
+                                <li><strong>Clinical Trials</strong> - Latest Alzheimer's and cancer trials</li>
+                                <li><strong>Side Effects</strong> - SSRIs, statins, and more</li>
+                                <li><strong>Dosage Guidelines</strong> - Ibuprofen, amoxicillin dosing</li>
+                                <li><strong>Disease Treatments</strong> - Alzheimer's medications</li>
+                            </ul>
+                            <p>Try asking: "What are the interactions with ibuprofen?" or "Latest Alzheimer's trials"</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load chat history
+        function loadChatHistory() {
+            const saved = localStorage.getItem('chatHistory');
+            if (saved) {
+                chatHistory = JSON.parse(saved);
+            } else {
+                // Default history
+                chatHistory = [
+                    { id: '1', title: 'Ibuprofen interactions', date: '2024-01-15' },
+                    { id: '2', title: 'Alzheimer trials 2024', date: '2024-01-14' },
+                    { id: '3', title: 'Amoxicillin dosage', date: '2024-01-13' },
+                    { id: '4', title: 'SSRI side effects', date: '2024-01-12' },
+                    { id: '5', title: 'Cancer trials update', date: '2024-01-11' }
+                ];
+            }
+            renderChatHistory();
+        }
+
+        // Render chat history
+        function renderChatHistory() {
+            const historyDiv = document.getElementById('chatHistory');
+            historyDiv.innerHTML = '';
+            
+            chatHistory.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = `history-item ${chat.id === currentChatId ? 'active' : ''}`;
+                item.innerHTML = `
+                    <span class="history-icon">💬</span>
+                    <span class="history-title">${chat.title}</span>
+                    <span class="delete-chat" onclick="deleteChat('${chat.id}', event)">✕</span>
+                `;
+                item.onclick = (e) => {
+                    if (!e.target.classList.contains('delete-chat')) {
+                        loadChat(chat.id);
+                    }
+                };
+                historyDiv.appendChild(item);
+            });
+        }
+
+        // Start new chat
+        function startNewChat() {
+            const newChat = {
+                id: Date.now().toString(),
+                title: 'New conversation',
+                date: new Date().toISOString().split('T')[0]
+            };
+            chatHistory.unshift(newChat);
+            currentChatId = newChat.id;
+            saveChatHistory();
+            renderChatHistory();
+            showWelcomeMessage();
+        }
+
+        // Load chat
+        function loadChat(chatId) {
+            currentChatId = chatId;
+            renderChatHistory();
+            // Load chat messages would go here
+        }
+
+        // Delete chat
+        function deleteChat(chatId, event) {
+            event.stopPropagation();
+            chatHistory = chatHistory.filter(chat => chat.id !== chatId);
+            if (currentChatId === chatId) {
+                currentChatId = null;
+                showWelcomeMessage();
+            }
+            saveChatHistory();
+            renderChatHistory();
+        }
+
+        // Save chat history
+        function saveChatHistory() {
+            localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        }
+
+        // Toggle sidebar
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+        }
+
+        // Quick ask
+        function quickAsk(query) {
+            document.getElementById('queryInput').value = query;
+            sendQuery();
+        }
+
+        // Handle Enter key
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendQuery();
+            }
+        }
+
+        // Send query - FIXED VERSION
+        function sendQuery() {
+            const input = document.getElementById('queryInput');
+            const query = input.value.trim();
+            
+            if (!query) return;
+            
+            if (!isPremium && queriesRemaining <= 0) {
+                alert('You have used all free queries. Please upgrade to Premium!');
+                openPremiumModal();
+                return;
+            }
+            
+            // Add user message
+            addMessage('user', query);
+            input.value = '';
+            
+            // Auto-resize textarea
+            input.style.height = 'auto';
+            
+            // Simulate AI response
+            setTimeout(() => {
+                const response = findResponse(query);
+                addMessage('ai', response.text, response.sources);
+                
+                if (!isPremium) {
+                    queriesRemaining--;
+                    updateQueryDisplay();
+                }
+                
+                // Update chat title if needed
+                if (chatHistory.length > 0 && chatHistory[0].title === 'New conversation') {
+                    chatHistory[0].title = query.substring(0, 30) + '...';
+                    renderChatHistory();
+                    saveChatHistory();
+                }
+            }, 1000);
+        }
+
+        // Find response in database - IMPROVED MATCHING
+        function findResponse(query) {
+            query = query.toLowerCase().trim();
+            
+            // Search through all categories
+            for (let category in responseDatabase) {
+                for (let item of responseDatabase[category]) {
+                    // Check each keyword
+                    for (let keyword of item.keywords) {
+                        if (query.includes(keyword)) {
+                            return { 
+                                text: item.response, 
+                                sources: item.sources 
+                            };
+                        }
+                    }
+                }
+            }
+            
+            // Default response with suggestions
+            return {
+                text: "I can help you with pharmaceutical information! Here are some things you can ask:\n\n• 'What are the interactions with ibuprofen?'\n• 'Latest Alzheimer's clinical trials'\n• 'SSRI side effects'\n• 'Amoxicillin dosage'\n• 'Cancer trials 2024'\n• 'Metformin interactions'\n\nJust type any of these questions and I'll give you detailed information!",
+                sources: "Try one of these suggested queries"
+            };
+        }
+
+        function addMessage(type, text, sources = null) {
+            const messagesDiv = document.getElementById('chatMessages');
+            const wrapper = document.createElement('div');
+            wrapper.className = `message-wrapper ${type === 'ai' ? 'ai-message' : ''}`;
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${type === 'ai' ? 'ai-avatar-message' : 'user-avatar-message'}`;
+            avatar.textContent = type === 'ai' ? 'AI' : 'You';
+            
+            const textDiv = document.createElement('div');
+            textDiv.className = 'message-text';
+            
+            // Format text with line breaks
+            const formattedText = text.replace(/\n/g, '<br>');
+            textDiv.innerHTML = `<p>${formattedText}</p>`;
+            
+            if (sources) {
+                const sourceDiv = document.createElement('div');
+                sourceDiv.className = 'source-citation';
+                sourceDiv.innerHTML = `<span>Sources:</span> ${sources}`;
+                textDiv.appendChild(sourceDiv);
+            }
+            
+            content.appendChild(avatar);
+            content.appendChild(textDiv);
+            wrapper.appendChild(content);
+            messagesDiv.appendChild(wrapper);
+            
+            // Scroll to bottom
+            document.getElementById('chatContainer').scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Update query display
+        function updateQueryDisplay() {
+            document.getElementById('queryDisplay').textContent = `Free: ${queriesRemaining}/10`;
+            document.getElementById('queryCount').textContent = `${queriesRemaining} free queries remaining`;
+            
+            if (queriesRemaining <= 0 && !isPremium) {
+                document.getElementById('sendButton').disabled = true;
+                document.getElementById('queryInput').disabled = true;
+            }
+        }
+
+        // Theme functions
+        function toggleTheme() {
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️ Light';
+                localStorage.setItem('theme', 'dark');
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = true;
+                }
+            } else {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                themeToggle.textContent = '🌙 Dark';
+                localStorage.setItem('theme', 'light');
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = false;
+                }
+            }
+        }
+
+        function toggleThemeFromSettings() {
+            toggleTheme();
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const body = document.body;
+            const themeToggle = document.getElementById('themeToggle');
+            
+            if (savedTheme === 'dark') {
+                body.classList.remove('light-mode');
+                body.classList.add('dark-mode');
+                themeToggle.textContent = '☀️ Light';
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = true;
+                }
+            } else {
+                body.classList.remove('dark-mode');
+                body.classList.add('light-mode');
+                themeToggle.textContent = '🌙 Dark';
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = false;
+                }
+            }
+        }
+
+        // Settings modal
+        function openSettingsModal() {
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        // Profile update
+        function updateProfile() {
+            const newName = document.getElementById('settingsName').value;
+            const newEmail = document.getElementById('settingsEmail').value;
+            
+            currentUser.fullName = newName;
+            currentUser.name = newName.split(' ')[0];
+            currentUser.email = newEmail;
+            
+            document.getElementById('sidebarUserName').textContent = currentUser.name;
+            document.getElementById('sidebarUserEmail').textContent = newEmail;
+            document.getElementById('sidebarUserAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+            
+            localStorage.setItem('userName', currentUser.name);
+            localStorage.setItem('userEmail', newEmail);
+            localStorage.setItem('userFullName', newName);
+            
+            alert('Profile updated successfully!');
+        }
+
+        // CRUD Operations
+        function exportData() {
+            const data = {
+                user: currentUser,
+                chatHistory: chatHistory,
+                preferences: {
+                    theme: localStorage.getItem('theme'),
+                    notifications: document.getElementById('emailNotifications') ? document.getElementById('emailNotifications').checked : true
+                }
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'pharmarag-data.json';
+            a.click();
+        }
+
+        function deleteAccount() {
+            if (confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+                localStorage.clear();
+                window.location.href = 'landing.html';
+            }
+        }
+
+        function clearAllChats() {
+            if (confirm('Are you sure you want to clear all chat history?')) {
+                chatHistory = [];
+                saveChatHistory();
+                renderChatHistory();
+                showWelcomeMessage();
+            }
+        }
+
+        function exportChats() {
+            const chatsBlob = new Blob([JSON.stringify(chatHistory, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(chatsBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'chat-history.json';
+            a.click();
+        }
+
+        // Premium functions
+        function openPremiumModal() {
+            document.getElementById('premiumModal').classList.add('active');
+        }
+
+        function closePremiumModal() {
+            document.getElementById('premiumModal').classList.remove('active');
+        }
+
+        function processPayment() {
+            alert('Welcome to Premium! You now have unlimited access.');
+            isPremium = true;
+            queriesRemaining = 999;
+            document.getElementById('sendButton').disabled = false;
+            document.getElementById('queryInput').disabled = false;
+            document.querySelector('.premium-badge').textContent = '⭐ Premium Active';
+            updateQueryDisplay();
+            closePremiumModal();
+        }
+
+        function handleLogout() {
+            localStorage.clear();
+            window.location.href = 'landing.html';
+        }
+
+        // Auto-resize textarea
+        document.getElementById('queryInput').addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Initialize
+        init();
+    </script>
+</body>
+</html>
