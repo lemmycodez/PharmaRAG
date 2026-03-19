@@ -350,6 +350,16 @@
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .premium-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.4);
+        }
+
+        .premium-badge.active {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
 
         .query-badge {
@@ -765,6 +775,48 @@
             transform: translateX(26px);
         }
 
+        /* Price Box */
+        .price-box {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 16px;
+        }
+
+        body.dark-mode .price-box {
+            background: #404040;
+        }
+
+        .price-box .price {
+            font-size: 40px;
+            font-weight: 800;
+            color: #0d4c5c;
+        }
+
+        body.dark-mode .price-box .price {
+            color: #2c7a8c;
+        }
+
+        /* Feature List */
+        .feature-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            color: #2c7a8c;
+            font-weight: bold;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -831,7 +883,7 @@
 
                 <div class="nav-right">
                     <span class="query-badge" id="queryDisplay">Free: 10/10</span>
-                    <span class="premium-badge" onclick="openPremiumModal()">⭐ Upgrade</span>
+                    <span class="premium-badge" onclick="window.location.href='payment.html'" id="premiumBadge">⭐ Upgrade</span>
                     <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙 Dark</button>
                     <button class="logout-btn" onclick="handleLogout()">Logout</button>
                 </div>
@@ -858,11 +910,11 @@
                 </div>
                 <div class="input-footer">
                     <div class="quick-actions">
-                        <span class="quick-action-chip" onclick="quickAsk('drug interactions')">💊 Interactions</span>
-                        <span class="quick-action-chip" onclick="quickAsk('clinical trials')">🔬 Trials</span>
-                        <span class="quick-action-chip" onclick="quickAsk('side effects')">📋 Side Effects</span>
-                        <span class="quick-action-chip" onclick="quickAsk('dosage guidelines')">⚕️ Dosage</span>
-                        <span class="quick-action-chip" onclick="quickAsk('alzheimer treatment')">🧠 Alzheimer's</span>
+                        <span class="quick-action-chip" onclick="quickAsk('What are the interactions with ibuprofen?')">💊 Ibuprofen</span>
+                        <span class="quick-action-chip" onclick="quickAsk('Latest Alzheimer\'s clinical trials')">🧠 Alzheimer's</span>
+                        <span class="quick-action-chip" onclick="quickAsk('SSRI side effects')">📋 SSRIs</span>
+                        <span class="quick-action-chip" onclick="quickAsk('Amoxicillin dosage')">⚕️ Amoxicillin</span>
+                        <span class="quick-action-chip" onclick="quickAsk('Cancer trials 2024')">🔬 Cancer</span>
                     </div>
                     <span id="queryCount">10 free queries remaining</span>
                 </div>
@@ -934,32 +986,6 @@
         </div>
     </div>
 
-    <!-- Premium Modal -->
-    <div class="modal" id="premiumModal">
-        <div class="modal-content">
-            <span class="close-modal" onclick="closePremiumModal()">&times;</span>
-            
-            <div class="modal-header">
-                <h2>🚀 Upgrade to Premium</h2>
-                <p>Unlock unlimited access</p>
-            </div>
-
-            <div class="price-box" style="text-align: center; margin-bottom: 30px; padding: 20px; background: #f8fafc; border-radius: 16px;">
-                <div style="font-size: 40px; font-weight: 800; color: #0d4c5c;">$49<span style="font-size: 14px; color: #64748b;">/month</span></div>
-            </div>
-
-            <ul style="list-style: none; margin-bottom: 30px;">
-                <li style="padding: 8px 0;">✓ Unlimited AI queries</li>
-                <li style="padding: 8px 0;">✓ Real-time clinical trial data</li>
-                <li style="padding: 8px 0;">✓ Advanced drug interaction checker</li>
-                <li style="padding: 8px 0;">✓ PDF export & reports</li>
-                <li style="padding: 8px 0;">✓ Priority support</li>
-            </ul>
-
-            <button class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="processPayment()">Upgrade Now</button>
-        </div>
-    </div>
-
     <script>
         // Global state
         let queriesRemaining = 10;
@@ -976,6 +1002,86 @@
         if (!localStorage.getItem('isLoggedIn')) {
             window.location.href = 'landing.html';
         }
+
+        // Check for premium status from payment page
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('upgrade') === 'success') {
+            isPremium = true;
+            queriesRemaining = 999;
+            localStorage.setItem('isPremium', 'true');
+            // Show success message
+            showUpgradeSuccess();
+        } else {
+            // Check localStorage for premium status
+            isPremium = localStorage.getItem('isPremium') === 'true';
+            if (isPremium) {
+                queriesRemaining = 999;
+            }
+        }
+
+        // Hardcoded responses database
+        const responseDatabase = {
+            'drug interactions': [
+                {
+                    keywords: ['ibuprofen', 'advil', 'motrin', 'nsaid'],
+                    response: 'Ibuprofen (NSAID) interactions:\n\n• Warfarin - Increased bleeding risk\n• Aspirin - Reduced cardioprotective effects\n• ACE Inhibitors - Reduced blood pressure control\n• Diuretics - Reduced effectiveness\n• Lithium - Increased lithium levels\n• Methotrexate - Increased toxicity\n• SSRIs - Increased bleeding risk\n• Corticosteroids - Increased GI bleeding risk\n• Alcohol - Increased stomach irritation\n• Anticoagulants - Enhanced anticoagulant effect',
+                    sources: 'FDA Drug Interactions Database, Mayo Clinic, Medscape'
+                },
+                {
+                    keywords: ['amoxicillin', 'amoxil', 'antibiotic'],
+                    response: 'Amoxicillin interactions:\n\n• Oral contraceptives - Reduced effectiveness\n• Warfarin - Increased INR\n• Allopurinol - Increased rash risk\n• Methotrexate - Increased toxicity\n• Probenecid - Increased amoxicillin levels\n• Tetracyclines - Reduced effectiveness\n• Antacids - Reduced absorption\n• Probiotics - May be killed by antibiotic\n• Live vaccines - Reduced effectiveness\n• Alcohol - No direct interaction, but may worsen side effects',
+                    sources: 'CDC Antibiotic Guidelines, Johns Hopkins ABX Guide'
+                },
+                {
+                    keywords: ['metformin', 'glucophage', 'diabetes'],
+                    response: 'Metformin interactions:\n\n• Alcohol - Increased lactic acidosis risk\n• Iodinated contrast - Acute kidney injury risk\n• Cimetidine - Increased metformin levels\n• Furosemide - Increased metformin levels\n• Nifedipine - Increased metformin absorption\n• Cationic drugs - Competition for renal transport\n• Topiramate - Increased lactic acidosis risk\n• Dolutegravir - Increased metformin levels\n• Vandetanib - Increased metformin levels\n• Carbamazepine - Reduced metformin effectiveness',
+                    sources: 'ADA Guidelines, Diabetes Care Journal'
+                }
+            ],
+            'clinical trials': [
+                {
+                    keywords: ['alzheimer', 'alzheimers', 'dementia', 'lecanemab', 'donanemab'],
+                    response: 'Latest Alzheimer\'s Clinical Trials (2024):\n\n1. Lecanemab (Phase 4) - 27% slowing in early AD\n2. Donanemab (Phase 3) - 35% slowing, FDA review pending\n3. Blarcamesine (Phase 2b/3) - Oral treatment showing promise\n4. Remternetug (Phase 3) - Next-gen anti-amyloid\n5. Buntanetap (Phase 2) - Neuroprotective effects\n6. Semaglutide (Phase 3) - Repurposed for AD\n7. ALZ-801 (Phase 3) - Oral anti-amyloid\n8. NE3107 (Phase 3) - Anti-inflammatory\n9. CT1812 (Phase 2) - Synaptic protection\n10. ATH-1017 (Phase 3) - Neurotrophic effects',
+                    sources: 'ClinicalTrials.gov, Alzheimer\'s Association, NEJM'
+                },
+                {
+                    keywords: ['cancer', 'oncology', 'tumor', 'mrna', 'immunotherapy'],
+                    response: 'Breakthrough Cancer Trials 2024:\n\n1. mRNA-4359 (Phase 1/2) - Lung cancer vaccine\n2. Iovance TIL (Phase 3) - Melanoma therapy\n3. CAR-T therapies (Phase 2) - Multiple myeloma\n4. Enhertu (Phase 3) - Breast cancer\n5. Opdualag (Phase 3) - Melanoma\n6. Keytruda combinations (Phase 3) - Various cancers\n7. T-DXd (Phase 3) - HER2+ cancers\n8. AMG 193 (Phase 1/2) - Solid tumors\n9. BMS-986299 (Phase 1) - Ovarian cancer\n10. Rezolute (Phase 2) - Pancreatic cancer',
+                    sources: 'NCI Cancer Trials, ASCO Publications'
+                }
+            ],
+            'side effects': [
+                {
+                    keywords: ['ssri', 'antidepressant', 'prozac', 'zoloft', 'celexa', 'depression'],
+                    response: 'Common SSRI Side Effects:\n\n1. Nausea (first 1-2 weeks)\n2. Headaches\n3. Insomnia or drowsiness\n4. Sexual dysfunction (30-50% of patients)\n5. Weight gain (long-term)\n6. Dry mouth\n7. Dizziness\n8. Increased anxiety (initial)\n9. Sweating\n10. GI disturbances',
+                    sources: 'JAMA Psychiatry, APA Guidelines'
+                },
+                {
+                    keywords: ['statin', 'lipitor', 'crestor', 'cholesterol'],
+                    response: 'Statin Side Effects Profile:\n\n1. Muscle pain (5-10%)\n2. Liver enzyme elevation\n3. Increased blood sugar\n4. Memory issues (rare)\n5. Confusion\n6. Headaches\n7. Nausea\n8. Rash\n9. Joint pain\n10. Peripheral neuropathy (rare)',
+                    sources: 'AHA/ACC Guidelines, NEJM'
+                }
+            ],
+            'dosage guidelines': [
+                {
+                    keywords: ['ibuprofen dosage', 'how much ibuprofen', 'ibuprofen dose', 'take ibuprofen'],
+                    response: 'Ibuprofen Dosing Guidelines:\n\nAdults:\n• Mild pain: 200-400mg q4-6h\n• Moderate pain: 400-600mg q6h\n• Max daily: 1200mg OTC, 3200mg prescription\n\nChildren:\n• 5-10mg/kg q6-8h\n• Max: 40mg/kg/day\n\nSpecial populations:\n• Elderly: Start at lowest dose\n• Renal impairment: Avoid or reduce dose\n• Hepatic impairment: Caution advised',
+                    sources: 'FDA Label, Pediatric Dosage Handbook'
+                },
+                {
+                    keywords: ['amoxicillin dosage', 'how much amoxicillin', 'amoxicillin dose', 'take amoxicillin'],
+                    response: 'Amoxicillin Dosing:\n\nAdults:\n• Mild infections: 250-500mg q8h\n• Severe infections: 875mg q12h\n• Strep throat: 50mg/kg/day (max 1000mg/day)\n\nChildren:\n• 20-90mg/kg/day divided q8-12h\n• Otitis media: 80-90mg/kg/day\n\nDuration:\n• Standard: 7-10 days\n• Strep throat: 10 days minimum',
+                    sources: 'Sanford Guide, Pediatric Infectious Diseases'
+                }
+            ],
+            'alzheimer treatment': [
+                {
+                    keywords: ['alzheimer treatment', 'alzheimer medication', 'alzheimer drug', 'donepezil', 'aricept', 'memantine', 'treat alzheimer'],
+                    response: 'Current Alzheimer\'s Treatments:\n\n1. Cholinesterase Inhibitors:\n   • Donepezil (Aricept) - All stages\n   • Rivastigmine (Exelon) - Mild to moderate\n   • Galantamine (Razadyne) - Mild to moderate\n\n2. NMDA Antagonist:\n   • Memantine (Namenda) - Moderate to severe\n\n3. Anti-amyloid antibodies:\n   • Lecanemab (Leqembi) - Early AD\n   • Donanemab (pending approval)\n\n4. Symptomatic treatments:\n   • Antidepressants\n   • Antipsychotics (caution)\n   • Mood stabilizers',
+                    sources: 'Alzheimer\'s Association, Neurology Journal'
+                }
+            ]
+        };
 
         // Initialize
         function init() {
@@ -995,88 +1101,57 @@
             showWelcomeMessage();
             
             updateQueryDisplay();
+            loadTheme();
+            
+            // Update premium badge if user is premium
+            if (isPremium) {
+                document.getElementById('premiumBadge').textContent = '⭐ Premium Active';
+                document.getElementById('premiumBadge').classList.add('active');
+            }
         }
 
-        // Hardcoded responses database
-        const responseDatabase = {
-            'drug interactions': [
-                {
-                    query: 'ibuprofen interactions',
-                    response: 'Ibuprofen (NSAID) interactions:\n\n• Warfarin - Increased bleeding risk\n• Aspirin - Reduced cardioprotective effects\n• ACE Inhibitors - Reduced blood pressure control\n• Diuretics - Reduced effectiveness\n• Lithium - Increased lithium levels\n• Methotrexate - Increased toxicity\n• SSRIs - Increased bleeding risk\n• Corticosteroids - Increased GI bleeding risk\n• Alcohol - Increased stomach irritation\n• Anticoagulants - Enhanced anticoagulant effect',
-                    sources: 'FDA Drug Interactions Database, Mayo Clinic, Medscape'
-                },
-                {
-                    query: 'amoxicillin interactions',
-                    response: 'Amoxicillin interactions:\n\n• Oral contraceptives - Reduced effectiveness\n• Warfarin - Increased INR\n• Allopurinol - Increased rash risk\n• Methotrexate - Increased toxicity\n• Probenecid - Increased amoxicillin levels\n• Tetracyclines - Reduced effectiveness\n• Antacids - Reduced absorption\n• Probiotics - May be killed by antibiotic\n• Live vaccines - Reduced effectiveness\n• Alcohol - No direct interaction, but may worsen side effects',
-                    sources: 'CDC Antibiotic Guidelines, Johns Hopkins ABX Guide'
-                },
-                {
-                    query: 'metformin interactions',
-                    response: 'Metformin interactions:\n\n• Alcohol - Increased lactic acidosis risk\n• Iodinated contrast - Acute kidney injury risk\n• Cimetidine - Increased metformin levels\n• Furosemide - Increased metformin levels\n• Nifedipine - Increased metformin absorption\n• Cationic drugs - Competition for renal transport\n• Topiramate - Increased lactic acidosis risk\n• Dolutegravir - Increased metformin levels\n• Vandetanib - Increased metformin levels\n• Carbamazepine - Reduced metformin effectiveness',
-                    sources: 'ADA Guidelines, Diabetes Care Journal'
-                }
-            ],
-            'clinical trials': [
-                {
-                    query: 'alzheimer trials',
-                    response: 'Latest Alzheimer\'s Clinical Trials (2024):\n\n1. Lecanemab (Phase 4) - 27% slowing in early AD\n2. Donanemab (Phase 3) - 35% slowing, FDA review pending\n3. Blarcamesine (Phase 2b/3) - Oral treatment showing promise\n4. Remternetug (Phase 3) - Next-gen anti-amyloid\n5. Buntanetap (Phase 2) - Neuroprotective effects\n6. Semaglutide (Phase 3) - Repurposed for AD\n7. ALZ-801 (Phase 3) - Oral anti-amyloid\n8. NE3107 (Phase 3) - Anti-inflammatory\n9. CT1812 (Phase 2) - Synaptic protection\n10. ATH-1017 (Phase 3) - Neurotrophic effects',
-                    sources: 'ClinicalTrials.gov, Alzheimer\'s Association, NEJM'
-                },
-                {
-                    query: 'cancer trials',
-                    response: 'Breakthrough Cancer Trials 2024:\n\n1. mRNA-4359 (Phase 1/2) - Lung cancer vaccine\n2. Iovance TIL (Phase 3) - Melanoma therapy\n3. CAR-T therapies (Phase 2) - Multiple myeloma\n4. Enhertu (Phase 3) - Breast cancer\n5. Opdualag (Phase 3) - Melanoma\n6. Keytruda combinations (Phase 3) - Various cancers\n7. T-DXd (Phase 3) - HER2+ cancers\n8. AMG 193 (Phase 1/2) - Solid tumors\n9. BMS-986299 (Phase 1) - Ovarian cancer\n10. Rezolute (Phase 2) - Pancreatic cancer',
-                    sources: 'NCI Cancer Trials, ASCO Publications'
-                }
-            ],
-            'side effects': [
-                {
-                    query: 'ssri side effects',
-                    response: 'Common SSRI Side Effects:\n\n1. Nausea (first 1-2 weeks)\n2. Headaches\n3. Insomnia or drowsiness\n4. Sexual dysfunction (30-50% of patients)\n5. Weight gain (long-term)\n6. Dry mouth\n7. Dizziness\n8. Increased anxiety (initial)\n9. Sweating\n10. GI disturbances',
-                    sources: 'JAMA Psychiatry, APA Guidelines'
-                },
-                {
-                    query: 'statin side effects',
-                    response: 'Statin Side Effects Profile:\n\n1. Muscle pain (5-10%)\n2. Liver enzyme elevation\n3. Increased blood sugar\n4. Memory issues (rare)\n5. Confusion\n6. Headaches\n7. Nausea\n8. Rash\n9. Joint pain\n10. Peripheral neuropathy (rare)',
-                    sources: 'AHA/ACC Guidelines, NEJM'
-                }
-            ],
-            'dosage guidelines': [
-                {
-                    query: 'ibuprofen dosage',
-                    response: 'Ibuprofen Dosing Guidelines:\n\nAdults:\n• Mild pain: 200-400mg q4-6h\n• Moderate pain: 400-600mg q6h\n• Max daily: 1200mg OTC, 3200mg prescription\n\nChildren:\n• 5-10mg/kg q6-8h\n• Max: 40mg/kg/day\n\nSpecial populations:\n• Elderly: Start at lowest dose\n• Renal impairment: Avoid or reduce dose\n• Hepatic impairment: Caution advised',
-                    sources: 'FDA Label, Pediatric Dosage Handbook'
-                },
-                {
-                    query: 'amoxicillin dosage',
-                    response: 'Amoxicillin Dosing:\n\nAdults:\n• Mild infections: 250-500mg q8h\n• Severe infections: 875mg q12h\n• Strep throat: 50mg/kg/day (max 1000mg/day)\n\nChildren:\n• 20-90mg/kg/day divided q8-12h\n• Otitis media: 80-90mg/kg/day\n\nDuration:\n• Standard: 7-10 days\n• Strep throat: 10 days minimum',
-                    sources: 'Sanford Guide, Pediatric Infectious Diseases'
-                }
-            ],
-            'alzheimer treatment': [
-                {
-                    query: 'alzheimer medications',
-                    response: 'Current Alzheimer\'s Treatments:\n\n1. Cholinesterase Inhibitors:\n   • Donepezil (Aricept) - All stages\n   • Rivastigmine (Exelon) - Mild to moderate\n   • Galantamine (Razadyne) - Mild to moderate\n\n2. NMDA Antagonist:\n   • Memantine (Namenda) - Moderate to severe\n\n3. Anti-amyloid antibodies:\n   • Lecanemab (Leqembi) - Early AD\n   • Donanemab (pending approval)\n\n4. Symptomatic treatments:\n   • Antidepressants\n   • Antipsychotics (caution)\n   • Mood stabilizers',
-                    sources: 'Alzheimer\'s Association, Neurology Journal'
-                }
-            ]
-        };
+        // Show upgrade success message
+        function showUpgradeSuccess() {
+            const messagesDiv = document.getElementById('chatMessages');
+            const successMessage = document.createElement('div');
+            successMessage.className = 'message-wrapper ai-message';
+            successMessage.innerHTML = `
+                <div class="message-content">
+                    <div class="message-avatar ai-avatar-message">AI</div>
+                    <div class="message-text">
+                        <p>🎉 <strong>Congratulations! You are now a Premium member!</strong></p>
+                        <p>You now have unlimited access to all features:</p>
+                        <ul>
+                            <li>Unlimited AI queries</li>
+                            <li>Real-time clinical trial data</li>
+                            <li>Advanced drug interaction checker</li>
+                            <li>PDF export & reports</li>
+                        </ul>
+                        <p>Thank you for upgrading! How can I help you today?</p>
+                    </div>
+                </div>
+            `;
+            messagesDiv.insertBefore(successMessage, messagesDiv.firstChild);
+        }
 
         // Show welcome message
         function showWelcomeMessage() {
             const messagesDiv = document.getElementById('chatMessages');
+            const premiumMessage = isPremium ? '✨ <strong>Premium Member</strong> - Unlimited queries' : '🔬 Free Trial - 10 queries remaining';
+            
             messagesDiv.innerHTML = `
                 <div class="message-wrapper ai-message">
                     <div class="message-content">
                         <div class="message-avatar ai-avatar-message">AI</div>
                         <div class="message-text">
-                            <p>Hello Dr. ${currentUser.name}! 👋 I'm your pharmaceutical AI assistant.</p>
+                            <p>Hello Dr. ${currentUser.name}! 👋 I'm your pharmaceutical AI assistant. ${premiumMessage}</p>
                             <p>I can help you with:</p>
                             <ul>
-                                <li><strong>Drug Interactions</strong> - Check interactions between medications</li>
-                                <li><strong>Clinical Trials</strong> - Latest trial data and results</li>
-                                <li><strong>Side Effects</strong> - Common and rare adverse effects</li>
-                                <li><strong>Dosage Guidelines</strong> - Adult and pediatric dosing</li>
-                                <li><strong>Disease Treatments</strong> - Current treatment protocols</li>
+                                <li><strong>Drug Interactions</strong> - Ask about ibuprofen, amoxicillin, metformin</li>
+                                <li><strong>Clinical Trials</strong> - Latest Alzheimer's and cancer trials</li>
+                                <li><strong>Side Effects</strong> - SSRIs, statins, and more</li>
+                                <li><strong>Dosage Guidelines</strong> - Ibuprofen, amoxicillin dosing</li>
+                                <li><strong>Disease Treatments</strong> - Alzheimer's medications</li>
                             </ul>
                             <p>Try asking: "What are the interactions with ibuprofen?" or "Latest Alzheimer's trials"</p>
                         </div>
@@ -1097,12 +1172,7 @@
                     { id: '2', title: 'Alzheimer trials 2024', date: '2024-01-14' },
                     { id: '3', title: 'Amoxicillin dosage', date: '2024-01-13' },
                     { id: '4', title: 'SSRI side effects', date: '2024-01-12' },
-                    { id: '5', title: 'Cancer trials update', date: '2024-01-11' },
-                    { id: '6', title: 'Metformin interactions', date: '2024-01-10' },
-                    { id: '7', title: 'Statin side effects', date: '2024-01-09' },
-                    { id: '8', title: 'Alzheimer medications', date: '2024-01-08' },
-                    { id: '9', title: 'Pediatric dosages', date: '2024-01-07' },
-                    { id: '10', title: 'Drug interactions guide', date: '2024-01-06' }
+                    { id: '5', title: 'Cancer trials update', date: '2024-01-11' }
                 ];
             }
             renderChatHistory();
@@ -1174,8 +1244,7 @@
         }
 
         // Quick ask
-        function quickAsk(category) {
-            const query = category;
+        function quickAsk(query) {
             document.getElementById('queryInput').value = query;
             sendQuery();
         }
@@ -1196,8 +1265,8 @@
             if (!query) return;
             
             if (!isPremium && queriesRemaining <= 0) {
-                alert('You have used all free queries. Please upgrade to Premium!');
-                openPremiumModal();
+                alert('You have used all free queries. Please upgrade to Premium for unlimited access!');
+                window.location.href = 'payment.html';
                 return;
             }
             
@@ -1213,7 +1282,6 @@
                 const response = findResponse(query);
                 addMessage('ai', response.text, response.sources);
                 
-                // Add to history if new
                 if (!isPremium) {
                     queriesRemaining--;
                     updateQueryDisplay();
@@ -1230,21 +1298,27 @@
 
         // Find response in database
         function findResponse(query) {
-            query = query.toLowerCase();
+            query = query.toLowerCase().trim();
             
-            // Search through database
+            // Search through all categories
             for (let category in responseDatabase) {
                 for (let item of responseDatabase[category]) {
-                    if (query.includes(item.query)) {
-                        return { text: item.response, sources: item.sources };
+                    // Check each keyword
+                    for (let keyword of item.keywords) {
+                        if (query.includes(keyword)) {
+                            return { 
+                                text: item.response, 
+                                sources: item.sources 
+                            };
+                        }
                     }
                 }
             }
             
-            // Default response
+            // Default response with suggestions
             return {
-                text: "I understand you're asking about pharmaceutical information. Based on current medical literature, I'd recommend consulting the specific drug monograph or a clinical pharmacist for detailed information about this query. For more specific questions about drug interactions, clinical trials, or dosage guidelines, please provide more details about the medication you're interested in.",
-                sources: "General Medical Literature, FDA Database"
+                text: "I can help you with pharmaceutical information! Here are some things you can ask:\n\n• 'What are the interactions with ibuprofen?'\n• 'Latest Alzheimer's clinical trials'\n• 'SSRI side effects'\n• 'Amoxicillin dosage'\n• 'Cancer trials 2024'\n• 'Metformin interactions'\n\nJust type any of these questions and I'll give you detailed information!",
+                sources: "Try one of these suggested queries"
             };
         }
 
@@ -1285,12 +1359,19 @@
 
         // Update query display
         function updateQueryDisplay() {
-            document.getElementById('queryDisplay').textContent = `Free: ${queriesRemaining}/10`;
-            document.getElementById('queryCount').textContent = `${queriesRemaining} free queries remaining`;
-            
-            if (queriesRemaining <= 0 && !isPremium) {
-                document.getElementById('sendButton').disabled = true;
-                document.getElementById('queryInput').disabled = true;
+            if (isPremium) {
+                document.getElementById('queryDisplay').textContent = `Premium: Unlimited`;
+                document.getElementById('queryCount').textContent = `Premium: Unlimited queries`;
+                document.getElementById('sendButton').disabled = false;
+                document.getElementById('queryInput').disabled = false;
+            } else {
+                document.getElementById('queryDisplay').textContent = `Free: ${queriesRemaining}/10`;
+                document.getElementById('queryCount').textContent = `${queriesRemaining} free queries remaining`;
+                
+                if (queriesRemaining <= 0) {
+                    document.getElementById('sendButton').disabled = true;
+                    document.getElementById('queryInput').disabled = true;
+                }
             }
         }
 
@@ -1304,13 +1385,17 @@
                 body.classList.add('dark-mode');
                 themeToggle.textContent = '☀️ Light';
                 localStorage.setItem('theme', 'dark');
-                document.getElementById('darkModeToggle').checked = true;
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = true;
+                }
             } else {
                 body.classList.remove('dark-mode');
                 body.classList.add('light-mode');
                 themeToggle.textContent = '🌙 Dark';
                 localStorage.setItem('theme', 'light');
-                document.getElementById('darkModeToggle').checked = false;
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = false;
+                }
             }
         }
 
@@ -1328,12 +1413,16 @@
                 body.classList.remove('light-mode');
                 body.classList.add('dark-mode');
                 themeToggle.textContent = '☀️ Light';
-                document.getElementById('darkModeToggle').checked = true;
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = true;
+                }
             } else {
                 body.classList.remove('dark-mode');
                 body.classList.add('light-mode');
                 themeToggle.textContent = '🌙 Dark';
-                document.getElementById('darkModeToggle').checked = false;
+                if (document.getElementById('darkModeToggle')) {
+                    document.getElementById('darkModeToggle').checked = false;
+                }
             }
         }
 
@@ -1373,7 +1462,7 @@
                 chatHistory: chatHistory,
                 preferences: {
                     theme: localStorage.getItem('theme'),
-                    notifications: document.getElementById('emailNotifications').checked
+                    notifications: document.getElementById('emailNotifications') ? document.getElementById('emailNotifications').checked : true
                 }
             };
             
@@ -1410,26 +1499,6 @@
             a.click();
         }
 
-        // Premium functions
-        function openPremiumModal() {
-            document.getElementById('premiumModal').classList.add('active');
-        }
-
-        function closePremiumModal() {
-            document.getElementById('premiumModal').classList.remove('active');
-        }
-
-        function processPayment() {
-            alert('Welcome to Premium! You now have unlimited access.');
-            isPremium = true;
-            queriesRemaining = Infinity;
-            document.getElementById('sendButton').disabled = false;
-            document.getElementById('queryInput').disabled = false;
-            document.querySelector('.premium-badge').textContent = '⭐ Premium Active';
-            updateQueryDisplay();
-            closePremiumModal();
-        }
-
         function handleLogout() {
             localStorage.clear();
             window.location.href = 'landing.html';
@@ -1442,7 +1511,6 @@
         });
 
         // Initialize
-        loadTheme();
         init();
     </script>
 </body>

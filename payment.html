@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaRAG | Upgrade to Premium</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .payment-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Plan Details Section */
+        .plan-section {
+            background: linear-gradient(135deg, #0d4c5c 0%, #2c7a8c 100%);
+            padding: 50px;
+            color: white;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 40px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: white;
+        }
+
+        .plan-badge {
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .plan-section h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .plan-section h1 span {
+            color: #ffd700;
+        }
+
+        .price-tag {
+            margin-bottom: 40px;
+        }
+
+        .price {
+            font-size: 60px;
+            font-weight: 800;
+            display: inline-block;
+        }
+
+        .period {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-left: 5px;
+        }
+
+        .savings {
+            background: rgba(255,215,0,0.2);
+            color: #ffd700;
+            padding: 5px 12px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-left: 15px;
+        }
+
+        .feature-list {
+            list-style: none;
+            margin-bottom: 40px;
+        }
+
+        .feature-list li {
+            padding: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .feature-list li:before {
+            content: "✓";
+            background: rgba(255,255,255,0.2);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .guarantee {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 16px;
+            margin-top: 30px;
+        }
+
+        .guarantee-icon {
+            font-size: 32px;
+        }
+
+        .guarantee-text {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Payment Form Section */
+        .payment-section {
+            padding: 50px;
+            background: white;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #10b981;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        .secure-badge:before {
+            content: "🔒";
+            font-size: 18px;
+        }
+
+        .payment-section h2 {
+            color: #1e293b;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .payment-subtitle {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .payment-method {
+            text-align: center;
+            padding: 15px 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #64748b;
+            background: #f8fafc;
+        }
+
+        .payment-method.active {
+            border-color: #2c7a8c;
+            background: #e0f2fe;
+            color: #0d4c5c;
+        }
+
+        .payment-method:hover {
+            border-color: #2c7a8c;
+        }
+
+        .payment-method .method-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .payment-method .method-name {
+            font-size: 12px;
+        }
+
+        /* Mobile Money Section */
+        .mobile-money-section {
+            margin-top: 20px;
+        }
+
+        .network-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .network-option {
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .network-option.active {
+            border-color: #2c7a8c;
+            background: #e0f2fe;
+        }
+
+        .network-option .network-icon {
+            font-size: 32px;
+        }
+
+        .network-option .network-name {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Custom Icon Styles */
+        .airtel-icon {
+            background: #e40000; /* Airtel Red */
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 0 auto 5px;
+            box-shadow: 0 2px 5px rgba(228, 0, 0, 0.3);
+        }
+
+        .mtn-icon {
+            background: #ffcc00; /* MTN Yellow */
+            color: #000000;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            margin: 0 auto 5px;
+            border: 1px solid #e6b800;
+        }
+
+        .zamtel-icon {
+            background: #1a3b5d; /* Zamtel Blue */
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            margin: 0 auto 5px;
+            text-transform: uppercase;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 5px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f8fafc;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: #2c7a8c;
+            outline: none;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(44, 122, 140, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #ef4444;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .phone-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            gap: 10px;
+        }
+
+        .pay-button {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #0d4c5c 0%, #2c7a8c 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 30px 0 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pay-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(44, 122, 140, 0.4);
+        }
+
+        .pay-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .pay-button.loading {
+            color: transparent;
+        }
+
+        .pay-button.loading:after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin: -10px 0 0 -10px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .payment-status {
+            padding: 16px;
+            border-radius: 12px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        .payment-status.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+            display: block;
+        }
+
+        .payment-status.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+
+        .payment-status.info {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            display: block;
+        }
+
+        .payment-status.pending {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+            display: block;
+        }
+
+        .test-cards {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f1f5f9;
+            border-radius: 16px;
+            font-size: 13px;
+        }
+
+        .test-cards h4 {
+            color: #475569;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .test-card-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            color: #64748b;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .test-card-item:last-child {
+            border-bottom: none;
+        }
+
+        .test-card-number {
+            font-family: monospace;
+            background: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            color: #0d4c5c;
+            font-weight: 600;
+        }
+
+        .test-instructions {
+            margin-top: 15px;
+            padding: 12px;
+            background: #e0f2fe;
+            border-radius: 8px;
+            color: #0d4c5c;
+            font-size: 13px;
+        }
+
+        .terms {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 20px;
+        }
+
+        .terms a {
+            color: #2c7a8c;
+            text-decoration: none;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        /* Network-specific colors for icons */
+        .airtel-bg { background: #e40000; color: white; }
+        .mtn-bg { background: #ffcc00; color: black; }
+        .zamtel-bg { background: #1a3b5d; color: white; }
+
+        @media (max-width: 768px) {
+            .payment-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .plan-section, .payment-section {
+                padding: 30px;
+            }
+            
+            .price {
+                font-size: 48px;
+            }
+            
+            .payment-methods {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <!-- Plan Details Section -->
+        <div class="plan-section">
+            <a href="chatbot.html" class="back-link">
+                ← Back to Chatbot
+            </a>
+            
+            <div class="plan-badge">
+                ⭐ PREMIUM PLAN
+            </div>
+            
+            <h1>Unlock <span>Unlimited</span> Access</h1>
+            
+            <div class="price-tag">
+                <span class="price">$49</span>
+                <span class="period">/month</span>
+                <span class="savings">Save 20% annually</span>
+            </div>
+            
+            <ul class="feature-list">
+                <li>Unlimited AI queries</li>
+                <li>Real-time clinical trial data</li>
+                <li>Advanced drug interaction checker</li>
+                <li>PDF export & reports</li>
+                <li>Priority 24/7 support</li>
+                <li>API access for integration</li>
+                <li>Team collaboration features</li>
+                <li>Custom alerts & monitoring</li>
+            </ul>
+            
+            <div class="guarantee">
+                <div class="guarantee-icon">🛡️</div>
+                <div class="guarantee-text">
+                    <strong>30-day money-back guarantee</strong><br>
+                    Not satisfied? Get a full refund within 30 days.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Payment Form Section -->
+        <div class="payment-section">
+            <div class="secure-badge">
+                Secure payment - SSL encrypted
+            </div>
+            
+            <h2>Payment Details</h2>
+            <p class="payment-subtitle">Choose your preferred payment method</p>
+            
+            <!-- Payment Method Selection -->
+            <div class="payment-methods">
+                <div class="payment-method active" onclick="selectPaymentMethod('card')" id="methodCard">
+                    <div class="method-icon">💳</div>
+                    <div class="method-name">Credit Card</div>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('airtel')" id="methodAirtel">
+                    <div class="method-icon">
+                        <div class="airtel-icon">A</div>
+                    </div>
+                    <div class="method-name">Airtel</div>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('mtn')" id="methodMtn">
+                    <div class="method-icon">
+                        <div class="mtn-icon">MTN</div>
+                    </div>
+                    <div class="method-name">MTN</div>
+                </div>
+                <div class="payment-method" onclick="selectPaymentMethod('zamtel')" id="methodZamtel">
+                    <div class="method-icon">
+                        <div class="zamtel-icon">Z</div>
+                    </div>
+                    <div class="method-name">Zamtel</div>
+                </div>
+            </div>
+            
+            <!-- Card Payment Form -->
+            <div id="cardForm">
+                <div class="form-group">
+                    <label>Card Number</label>
+                    <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19">
+                </div>
+                
+                <div class="form-group">
+                    <label>Cardholder Name</label>
+                    <input type="text" id="cardName" placeholder="John Doe">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Expiry Date</label>
+                        <input type="text" id="expiry" placeholder="MM/YY" maxlength="5">
+                    </div>
+                    <div class="form-group">
+                        <label>CVV</label>
+                        <input type="text" id="cvv" placeholder="123" maxlength="3">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Mobile Money Form (Airtel/MTN/Zamtel) -->
+            <div id="mobileMoneyForm" style="display: none;">
+                <div class="mobile-money-section">
+                    <!-- Network Selector -->
+                    <div class="network-selector">
+                        <div class="network-option active" onclick="selectNetwork('airtel')" id="networkAirtel">
+                            <div class="airtel-icon">A</div>
+                            <div class="network-name">Airtel Money</div>
+                        </div>
+                        <div class="network-option" onclick="selectNetwork('mtn')" id="networkMtn">
+                            <div class="mtn-icon">MTN</div>
+                            <div class="network-name">MTN MoMo</div>
+                        </div>
+                        <div class="network-option" onclick="selectNetwork('zamtel')" id="networkZamtel">
+                            <div class="zamtel-icon">Z</div>
+                            <div class="network-name">Zamtel Money</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Phone Number Input - Zambia Format (+260) -->
+                    <div class="form-group">
+                        <label>Mobile Money Phone Number</label>
+                        <div class="phone-row">
+                            <select id="countryCode" style="padding: 14px;">
+                                <option value="+260" selected>🇿🇲 +260</option>
+                                <option value="+254">🇰🇪 +254</option>
+                                <option value="+255">🇹🇿 +255</option>
+                                <option value="+250">🇷🇼 +250</option>
+                            </select>
+                            <input type="text" id="phoneNumber" placeholder="77xxxxxxx" maxlength="9">
+                        </div>
+                        <small style="color: #64748b; font-size: 12px;">
+                            <?php
+                            // Network prefixes for Zambia [citation:3][citation:6]
+                            // Airtel: 097/077, MTN: 096/076, Zamtel: 095
+                            ?>
+                            <span id="networkHint">Enter 9-digit number (e.g., 77xxxxxxx for Airtel)</span>
+                        </small>
+                    </div>
+                    
+                    <!-- Account Name (for demo) -->
+                    <div class="form-group">
+                        <label>Account Holder Name</label>
+                        <input type="text" id="accountName" placeholder="John Doe">
+                    </div>
+                    
+                    <!-- PIN (for demo - in real apps, this is done on USSD) -->
+                    <div class="form-group">
+                        <label>Mobile Money PIN (Demo Only)</label>
+                        <input type="password" id="mobilePin" placeholder="••••" maxlength="4">
+                        <small style="color: #ef4444; font-size: 12px;">For demo only. In production, you'll receive a USSD prompt.</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Payment Status Message -->
+            <div id="paymentStatus" class="payment-status"></div>
+            
+            <!-- Pay Button -->
+            <button class="pay-button" id="payButton" onclick="processPayment()">
+                Pay $49 - Upgrade to Premium
+            </button>
+            
+            <!-- Test Instructions -->
+            <div class="test-cards" id="testInstructions">
+                <h4>🔐 Test Mode Instructions</h4>
+                
+                <!-- Card Test (shown by default) -->
+                <div id="cardTest">
+                    <div class="test-card-item">
+                        <span>✅ Success (Card):</span>
+                        <span class="test-card-number">4242 4242 4242 4242</span>
+                    </div>
+                    <div class="test-card-item">
+                        <span>⚠️ Insufficient Funds:</span>
+                        <span class="test-card-number">4000 0000 0000 0002</span>
+                    </div>
+                    <div class="test-card-item">
+                        <span>❌ Card Declined:</span>
+                        <span class="test-card-number">4000 0000 0000 0010</span>
+                    </div>
+                </div>
+                
+                <!-- Mobile Money Test (hidden by default) -->
+                <div id="mobileTest" style="display: none;">
+                    <div class="test-card-item">
+                        <span>✅ Airtel Success:</span>
+                        <span class="test-card-number">+260 77 1234567</span>
+                    </div>
+                    <div class="test-card-item">
+                        <span>✅ MTN Success:</span>
+                        <span class="test-card-number">+260 76 1234567</span>
+                    </div>
+                    <div class="test-card-item">
+                        <span>✅ Zamtel Success:</span>
+                        <span class="test-card-number">+260 95 1234567</span>
+                    </div>
+                    <div class="test-card-item">
+                        <span>⚠️ Insufficient Balance:</span>
+                        <span class="test-card-number">+260 77 9999999</span>
+                    </div>
+                    <div class="test-card-item">
+                        <span>⏳ Pending Approval:</span>
+                        <span class="test-card-number">+260 77 8888888</span>
+                    </div>
+                </div>
+                
+                <div class="test-instructions">
+                    <strong>📱 Zambia Mobile Money Prefixes [citation:3]:</strong><br>
+                    • Airtel: 077 or 097<br>
+                    • MTN: 076 or 096<br>
+                    • Zamtel: 095<br>
+                    <br>
+                    <strong>How it works:</strong> Enter phone number → Click Pay → Simulated USSD prompt → Enter PIN → Success!
+                </div>
+            </div>
+            
+            <div class="terms">
+                By completing this purchase, you agree to our 
+                <a href="#">Terms of Service</a> and 
+                <a href="#">Privacy Policy</a>. 
+                Your subscription will auto-renew until cancelled.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let selectedMethod = 'card';
+        let selectedNetwork = 'airtel';
+        let isProcessing = false;
+        
+        // Check if user is logged in
+        if (!localStorage.getItem('isLoggedIn')) {
+            window.location.href = 'landing.html';
+        }
+        
+        // Payment method selection
+        function selectPaymentMethod(method) {
+            selectedMethod = method;
+            
+            // Update active state
+            document.getElementById('methodCard').classList.remove('active');
+            document.getElementById('methodAirtel').classList.remove('active');
+            document.getElementById('methodMtn').classList.remove('active');
+            document.getElementById('methodZamtel').classList.remove('active');
+            document.getElementById(`method${method.charAt(0).toUpperCase() + method.slice(1)}`).classList.add('active');
+            
+            // Show/hide forms
+            if (method === 'card') {
+                document.getElementById('cardForm').style.display = 'block';
+                document.getElementById('mobileMoneyForm').style.display = 'none';
+                document.getElementById('cardTest').style.display = 'block';
+                document.getElementById('mobileTest').style.display = 'none';
+            } else {
+                document.getElementById('cardForm').style.display = 'none';
+                document.getElementById('mobileMoneyForm').style.display = 'block';
+                document.getElementById('cardTest').style.display = 'none';
+                document.getElementById('mobileTest').style.display = 'block';
+                
+                // Auto-select network based on method
+                if (method === 'airtel') selectNetwork('airtel');
+                else if (method === 'mtn') selectNetwork('mtn');
+                else if (method === 'zamtel') selectNetwork('zamtel');
+            }
+        }
+        
+        // Network selection
+        function selectNetwork(network) {
+            selectedNetwork = network;
+            
+            document.getElementById('networkAirtel').classList.remove('active');
+            document.getElementById('networkMtn').classList.remove('active');
+            document.getElementById('networkZamtel').classList.remove('active');
+            document.getElementById(`network${network.charAt(0).toUpperCase() + network.slice(1)}`).classList.add('active');
+            
+            // Update hint based on network
+            const hint = document.getElementById('networkHint');
+            if (network === 'airtel') {
+                hint.innerHTML = 'Airtel Zambia: 077 or 097 followed by 7 digits [citation:3]';
+            } else if (network === 'mtn') {
+                hint.innerHTML = 'MTN Zambia: 076 or 096 followed by 7 digits [citation:3]';
+            } else if (network === 'zamtel') {
+                hint.innerHTML = 'Zamtel Zambia: 095 followed by 7 digits [citation:3]';
+            }
+        }
+        
+        // Main payment processing
+        function processPayment() {
+            if (isProcessing) return;
+            
+            if (selectedMethod === 'card') {
+                processCardPayment();
+            } else {
+                processMobileMoneyPayment();
+            }
+        }
+        
+        // Process card payment
+        function processCardPayment() {
+            const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+            const cardName = document.getElementById('cardName').value;
+            const expiry = document.getElementById('expiry').value;
+            const cvv = document.getElementById('cvv').value;
+            
+            // Validate fields
+            if (!validateCardFields(cardNumber, cardName, expiry, cvv)) {
+                return;
+            }
+            
+            // Process payment
+            isProcessing = true;
+            showProcessing();
+            
+            setTimeout(() => {
+                const result = simulateCardPayment(cardNumber);
+                handlePaymentResult(result);
+            }, 2000);
+        }
+        
+        // Process mobile money payment
+        function processMobileMoneyPayment() {
+            const countryCode = document.getElementById('countryCode').value;
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const accountName = document.getElementById('accountName').value;
+            const pin = document.getElementById('mobilePin').value;
+            
+            // Validate fields
+            if (!phoneNumber || phoneNumber.length < 9) {
+                showStatus('error', 'Please enter a valid 9-digit phone number');
+                document.getElementById('phoneNumber').classList.add('error');
+                return;
+            }
+            
+            // Validate network prefix matches selected network
+            const prefix = phoneNumber.substring(0, 2);
+            const validPrefix = validateNetworkPrefix(prefix, selectedNetwork);
+            
+            if (!validPrefix) {
+                const expected = getExpectedPrefix(selectedNetwork);
+                showStatus('error', `Invalid prefix for ${selectedNetwork}. Expected: ${expected}`);
+                document.getElementById('phoneNumber').classList.add('error');
+                return;
+            }
+            
+            if (!pin || pin.length !== 4) {
+                showStatus('error', 'Please enter your 4-digit PIN');
+                document.getElementById('mobilePin').classList.add('error');
+                return;
+            }
+            
+            // Clear errors
+            document.querySelectorAll('input').forEach(input => {
+                input.classList.remove('error');
+            });
+            
+            // Show pending status
+            showStatus('pending', `📱 Payment request sent to ${countryCode} ${phoneNumber}. Please check your phone for USSD prompt.`);
+            
+            isProcessing = true;
+            showProcessing();
+            
+            // Simulate USSD flow
+            setTimeout(() => {
+                showStatus('pending', '⏳ Waiting for authorization... Dial *126# to complete payment (simulated)');
+            }, 2000);
+            
+            setTimeout(() => {
+                const result = simulateMobileMoneyPayment(phoneNumber, selectedNetwork);
+                
+                if (result === 'success') {
+                    handlePaymentResult('success');
+                } else if (result === 'pending') {
+                    showStatus('pending', '⏳ Payment authorization in progress. Please complete on your phone...');
+                    
+                    setTimeout(() => {
+                        handlePaymentResult('success');
+                    }, 3000);
+                } else {
+                    handlePaymentResult(result);
+                }
+            }, 4000);
+        }
+        
+        // Validate network prefix based on Zambia numbering plan [citation:3][citation:6]
+        function validateNetworkPrefix(prefix, network) {
+            if (network === 'airtel') {
+                return prefix === '77' || prefix === '97';
+            } else if (network === 'mtn') {
+                return prefix === '76' || prefix === '96';
+            } else if (network === 'zamtel') {
+                return prefix === '95';
+            }
+            return false;
+        }
+        
+        function getExpectedPrefix(network) {
+            if (network === 'airtel') return '77 or 97';
+            if (network === 'mtn') return '76 or 96';
+            if (network === 'zamtel') return '95';
+            return '';
+        }
+        
+        // Validation functions
+        function validateCardFields(cardNumber, cardName, expiry, cvv) {
+            // Reset errors
+            document.querySelectorAll('input').forEach(input => {
+                input.classList.remove('error');
+            });
+            
+            if (!cardNumber || cardNumber.length < 16) {
+                document.getElementById('cardNumber').classList.add('error');
+                showStatus('error', 'Please enter a valid 16-digit card number');
+                return false;
+            }
+            
+            if (!cardName) {
+                document.getElementById('cardName').classList.add('error');
+                showStatus('error', 'Please enter the cardholder name');
+                return false;
+            }
+            
+            if (!expiry || !expiry.match(/^\d{2}\/\d{2}$/)) {
+                document.getElementById('expiry').classList.add('error');
+                showStatus('error', 'Please enter a valid expiry date (MM/YY)');
+                return false;
+            }
+            
+            if (!cvv || cvv.length < 3) {
+                document.getElementById('cvv').classList.add('error');
+                showStatus('error', 'Please enter a valid CVV');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Simulation functions
+        function simulateCardPayment(cardNumber) {
+            if (cardNumber === '4000000000000002') {
+                return 'insufficient';
+            } else if (cardNumber === '4000000000000010') {
+                return 'declined';
+            } else {
+                return 'success';
+            }
+        }
+        
+        function simulateMobileMoneyPayment(phoneNumber, network) {
+            // Test phone numbers
+            if (phoneNumber.includes('999999')) {
+                return 'insufficient';
+            } else if (phoneNumber.includes('888888')) {
+                return 'pending';
+            } else {
+                return 'success';
+            }
+        }
+        
+        function handlePaymentResult(result) {
+            switch(result) {
+                case 'success':
+                    showStatus('success', '✅ Payment successful! Redirecting to premium dashboard...');
+                    
+                    // Set premium status
+                    localStorage.setItem('isPremium', 'true');
+                    localStorage.setItem('premiumUntil', new Date(Date.now() + 30*24*60*60*1000).toISOString());
+                    localStorage.setItem('paymentMethod', selectedMethod);
+                    
+                    setTimeout(() => {
+                        window.location.href = 'chatbot.html?upgrade=success';
+                    }, 2000);
+                    break;
+                    
+                case 'insufficient':
+                    showStatus('error', '❌ Insufficient funds. Please check your balance or try another payment method.');
+                    resetProcessing();
+                    break;
+                    
+                case 'declined':
+                    showStatus('error', '❌ Payment declined. Please check your details or try another payment method.');
+                    resetProcessing();
+                    break;
+                    
+                case 'pending':
+                    // Already handled in mobile money flow
+                    break;
+            }
+        }
+        
+        function showStatus(type, message) {
+            const statusDiv = document.getElementById('paymentStatus');
+            statusDiv.className = `payment-status ${type}`;
+            statusDiv.textContent = message;
+        }
+        
+        function showProcessing() {
+            const payButton = document.getElementById('payButton');
+            payButton.classList.add('loading');
+            payButton.disabled = true;
+        }
+        
+        function resetProcessing() {
+            const payButton = document.getElementById('payButton');
+            payButton.classList.remove('loading');
+            payButton.disabled = false;
+            isProcessing = false;
+        }
+        
+        // Format card number
+        document.getElementById('cardNumber')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            if (value.length > 0) {
+                value = value.match(new RegExp('.{1,4}', 'g'))?.join(' ') || value;
+            }
+            e.target.value = value;
+        });
+        
+        // Format expiry
+        document.getElementById('expiry')?.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.slice(0, 2) + '/' + value.slice(2, 4);
+            }
+            e.target.value = value;
+        });
+        
+        // Only numbers for CVV
+        document.getElementById('cvv')?.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+        
+        // Only numbers for phone
+        document.getElementById('phoneNumber')?.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 9);
+        });
+        
+        // Only numbers for PIN
+        document.getElementById('mobilePin')?.addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '').substring(0, 4);
+        });
+        
+        // Auto-submit on Enter
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    processPayment();
+                }
+            });
+        });
+        
+        // Initialize with Zambia country code
+        document.getElementById('countryCode').value = '+260';
+    </script>
+</body>
+</html>
